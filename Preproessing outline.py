@@ -8,7 +8,7 @@ import raw from file path
     read info
     display raw?
 
-from rawdata get triggers (ST002?)
+from rawdata get triggers (ST006)
 
 Bads and artefact correction
     bad channels from excel (or already preprocessed)
