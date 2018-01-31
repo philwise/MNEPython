@@ -1,0 +1,4 @@
+Trigger channels for events
+Laser events: 'STI 006'
+Hand tactile: 'STI 001'
+Foot tactile: 'STI 003'
