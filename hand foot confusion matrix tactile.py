@@ -1,33 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Sep 22 22:04:01 2017
+Split off on Thur Feb 01 12:30 2018
 
-Preprocessing of raw dataset
-
-import raw from file path
-    read info
-    display raw?
-
-from rawdata get triggers (ST006)
-
-Bads and artefact correction
-    bad channels from excel (or already preprocessed)
-    in Range of triggers (2s before 3s after)
-        EOG correction
-        EKG correction
-        muscle artefacts?
-
-cut data into raw segments
-    raw cut 1.5s before and 2.5s after trigger
-    (what speed were hand/foot tactile?)
-write into data block (check what format is used here)
-
-    THIS MAY BE POST-PROCESSING
-possibly write second/third data block with filter (2-35Hz 20-80Hz)
-    depending on effort
-compile FFT file block
-
-on averaged dataset: already have average data from BESA, remember to pull off laptop
+Steps:
+    1. Import packages, import data
+    2. Add frequency filters
+    3. Find events from STI triggers, declare epochs
+    4. Create classification pipeline
+    5. Start matrix calculation, print matrix
+    
+To-do:
+    improve confusion matrix results
+    why is MEG data not good for model?
 
 @author: Philipp Wise
 """
@@ -56,9 +40,10 @@ workdir = data_path + '\\170314m1'
 raw_fname = workdir + '\post_tachafu_pw.fif'
 raw = mne.io.read_raw_fif (raw_fname, preload=True) #import raw file
 # raw.info['bads']
-raw.filter(1.5, 40)
-#raw.plot() #plot raw file in console, hash if not needed.
 
+raw.filter(1.5, 90) #filter for physiological freqs
+raw.notch_filter(50) #filter DC offset
+#raw.plot() #plot raw file in console, hash if not needed.
 
 #declare triggers and find events
 #STI: 006 is laser trigger, 001 is hand trigger, 003 is foot trigger
@@ -79,22 +64,18 @@ print('displaying all events')
 mne.viz.plot_events(allevents)
 
 #declare epochs
-tmin, tmax = -0.2, 0.5
+tmin, tmax = -0.2, 0.3
 event_id = {'Foot':5 , 'Hand':6}
 baseline = (None, 0.0)
+picks = mne.pick_types(raw.info, meg=False, eeg=True, stim=False, eog=False,
+                   exclude='bads')
+
 epochs = mne.Epochs(raw, events=allevents, event_id=event_id, tmin=tmin,
-                    tmax=tmax, preload=True)
-#epochs.plot(block=True)
+                    tmax=tmax, proj=False, picks=picks, baseline=None, preload=True,
+                verbose=False)
 
-#Average epochs
-picks = mne.pick_types(epochs.info, meg=True, eeg=True)
-evoked_hand = epochs['Hand'].average(picks=picks)
-evoked_foot = epochs['Foot'].average(picks=picks)
-evoked_hand.plot() #for plotting in console
-evoked_foot.plot()
-
-"""
 # Create classification pipeline
+print ('beginning matrix calculation')
 clf = make_pipeline(Xdawn(n_components=3),
                     Vectorizer(),
                     MinMaxScaler(),
@@ -105,7 +86,6 @@ labels = epochs.events[:, -1]
 
 # Cross validator
 cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
-print('everything still good')
 # Do cross-validation
 preds = np.empty(len(labels))
 for train, test in cv.split(epochs, labels):
@@ -122,6 +102,7 @@ cm = confusion_matrix(labels, preds)
 cm_normalized = cm.astype(float) / cm.sum(axis=1)[:, np.newaxis]
 
 # Plot confusion matrix
+print('plotting matrix')
 plt.imshow(cm_normalized, interpolation='nearest', cmap=plt.cm.Blues)
 plt.title('Normalized Confusion matrix')
 plt.colorbar()
@@ -132,4 +113,3 @@ tight_layout()
 plt.ylabel('True label')
 plt.xlabel('Predicted label')
 plt.show()
-"""
