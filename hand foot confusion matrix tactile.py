@@ -12,6 +12,7 @@ Steps:
 To-do:
     improve confusion matrix results
     why is MEG data not good for model?
+    Filter freq vital to learning algorithm
 
 @author: Philipp Wise
 """
@@ -36,17 +37,17 @@ from mne.viz import tight_layout
 
 #declare file path
 data_path = 'C:\Users\Philipp Wise\mne_data\MEGAnalysis'
-workdir = data_path + '\\170314m1'
-raw_fname = workdir + '\post_tachafu_pw.fif'
+workdir = data_path + '\\170405m2'
+raw_fname = workdir + '\praecaps_tac_ha_fu_sm.fif'
 raw = mne.io.read_raw_fif (raw_fname, preload=True) #import raw file
 # raw.info['bads']
 
-raw.filter(1.5, 90) #filter for physiological freqs
+raw.filter(10,65) #filter for physiological freqs
 raw.notch_filter(50) #filter DC offset
 #raw.plot() #plot raw file in console, hash if not needed.
 
 #declare triggers and find events
-#STI: 006 is laser trigger, 001 is hand trigger, 003 is foot trigger
+#STI: 006 is laser trigger, 001 is hand trigger, 003 (or 002?) is foot trigger
 events_hand = mne.find_events(raw, 'STI 001', min_duration=0.02)
 print('Found %s events, first five:' % len(events_hand))
 print(events_hand[:5])
@@ -54,17 +55,15 @@ print(events_hand[:5])
 events_hand[:,2] += 1
 print('Adding 1 to amplitutde value')
 
-events_foot = mne.find_events(raw, 'STI 003', min_duration=0.02)
+events_foot = mne.find_events(raw, 'STI 002', min_duration=0.02)
 print('Found %s events, first five:' % len(events_foot))
 print(events_foot[:5])
 
 #summarize events into one list
 allevents = np.concatenate((events_hand,events_foot))
-print('displaying all events')
-mne.viz.plot_events(allevents)
 
 #declare epochs
-tmin, tmax = -0.2, 0.3
+tmin, tmax = -0.2, 0.4
 event_id = {'Foot':5 , 'Hand':6}
 baseline = (None, 0.0)
 picks = mne.pick_types(raw.info, meg=False, eeg=True, stim=False, eog=False,

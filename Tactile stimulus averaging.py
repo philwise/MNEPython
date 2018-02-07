@@ -23,10 +23,10 @@ from mne import find_events
 
 #declare file path
 data_path = 'C:\Users\Philipp Wise\mne_data\MEGAnalysis'
-workdir = data_path + '\\170314m1'
-raw_fname = workdir + '\post_tachafu_pw.fif'
+workdir = data_path + '\\170518m1'
+raw_fname = workdir + '\postcaps_tac_ha_fu_sa.fif'
 raw = mne.io.read_raw_fif (raw_fname, preload=True) #import raw file
-# raw.info['bads']
+#raw.info['bads']
 raw.filter(1.5, 90)
 raw.notch_filter(50)
 #raw.plot() #plot raw file in console, hash if not needed.
@@ -41,7 +41,7 @@ print(events_hand[:5])
 events_hand[:,2] += 1
 print('Adding 1 to amplitutde value')
 
-events_foot = find_events(raw, 'STI 003', min_duration=0.02)
+events_foot = find_events(raw, 'STI 002', min_duration=0.02)
 print('Found %s events, first five:' % len(events_foot))
 print(events_foot[:5])
 
@@ -61,6 +61,7 @@ epochs = mne.Epochs(raw, events=allevents, event_id=event_id, tmin=tmin,
 
 #Average epochs
 picks = mne.pick_types(epochs.info, meg=True, eeg=True)
+epochs.drop_bad()
 evoked_hand = epochs['Hand'].average(picks=picks)
 evoked_foot = epochs['Foot'].average(picks=picks)
 evoked_hand.plot() #for plotting in console
