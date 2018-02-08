@@ -23,11 +23,11 @@ from mne import find_events
 
 #declare file path
 data_path = 'C:\Users\Philipp Wise\mne_data\MEGAnalysis'
-workdir = data_path + '\\170518m1'
-raw_fname = workdir + '\postcaps_tac_ha_fu_sa.fif'
+workdir = data_path + '\\170405m2'
+raw_fname = workdir + '\praecaps_tac_ha_fu_sm.fif'
 raw = mne.io.read_raw_fif (raw_fname, preload=True) #import raw file
 #raw.info['bads']
-raw.filter(1.5, 90)
+raw.filter(10, 65)
 raw.notch_filter(50)
 #raw.plot() #plot raw file in console, hash if not needed.
 
@@ -48,7 +48,7 @@ print(events_foot[:5])
 #summarize events into one list
 allevents = np.concatenate((events_hand,events_foot))
 print('displaying all events')
-mne.viz.plot_events(allevents)
+#mne.viz.plot_events(allevents)
 
 #declare epochs
 tmin, tmax = -0.2, 0.8

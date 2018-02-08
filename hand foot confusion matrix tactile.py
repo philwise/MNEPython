@@ -37,8 +37,8 @@ from mne.viz import tight_layout
 
 #declare file path
 data_path = 'C:\Users\Philipp Wise\mne_data\MEGAnalysis'
-workdir = data_path + '\\170405m2'
-raw_fname = workdir + '\praecaps_tac_ha_fu_sm.fif'
+workdir = data_path + '\\170720m1'
+raw_fname = workdir + '\prae_tac_ha_fu_kr.fif'
 raw = mne.io.read_raw_fif (raw_fname, preload=True) #import raw file
 # raw.info['bads']
 

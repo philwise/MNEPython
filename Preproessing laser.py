@@ -17,14 +17,13 @@ import os.path as op
 import numpy as np
 
 import mne
-print ("importing mne documentation")
 from mne import find_events
 
 
 #declare file path
 data_path = 'C:\Users\Philipp Wise\mne_data\MEGAnalysis'
 workdir = data_path + '\\170511m1'
-raw_fname = workdir + '\prae_fu_2J_sa.fif'
+raw_fname = workdir + '\prae_ha_2J_sa.fif'
 raw = mne.io.read_raw_fif (raw_fname, preload=True) #import raw file
 # raw.info['bads']
 raw.filter(1.5, 40)
@@ -36,7 +35,6 @@ raw.filter(1.5, 40)
 events_laser = find_events(raw, 'STI 006', min_duration=0.02)
 print('Found %s events, first five:' % len(events_laser))
 print(events_laser[:5])
-
 #mne.viz.plot_events(events_laser)
 
 #declare epochs
