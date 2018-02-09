@@ -27,7 +27,7 @@ workdir = data_path + '\\170405m2'
 raw_fname = workdir + '\praecaps_tac_ha_fu_sm.fif'
 raw = mne.io.read_raw_fif (raw_fname, preload=True) #import raw file
 #raw.info['bads']
-raw.filter(10, 65)
+raw.filter(1.6, 90)
 raw.notch_filter(50)
 #raw.plot() #plot raw file in console, hash if not needed.
 
